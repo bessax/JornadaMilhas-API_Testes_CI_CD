@@ -1,36 +1,31 @@
-# Este fluxo de trabalho irá construir um projeto .NET
-# Para mais informações, consulte: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: .NET
-
-on:
+'on':
   push:
-    branches: [ "main" ] # Corrigido para "main" pois muitos repositórios agora utilizam "main" como branch principal
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ] # Corrigido para "main" também
-
+    branches:
+      - main
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: '6.0.x' # Ajustado para aspas simples ao redor da versão
-    - name: Restore do Projeto de API
-      run: dotnet restore ./src/JornadaMilhas.API # Corrigido o comando de restore removendo espaços extras e adicionando barras inclinadas
-    - name: Restore do Projeto de Dados
-      run: dotnet restore ./src/JornadaMilhas.Dados # Corrigido o comando de restore removendo espaços extras e adicionando barras inclinadas
-    - name: Restore do Projeto de Domínio
-      run: dotnet restore ./src/JornadaMilhas.Dominio # Corrigido o comando de restore removendo espaços extras e adicionando barras inclinadas
-    - name: Build projeto de API
-      run: dotnet build ./src/JornadaMilhas.API --no-restore
-    - name: Build projeto de Dados
-      run: dotnet build ./src/JornadaMilhas.Dados --no-restore
-    - name: Build projeto de Domínio
-      run: dotnet build ./src/JornadaMilhas.Dominio --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore do Projeto de API
+        run: dotnet restore ./src/JornadaMilhas.API
+      - name: Restore do Projeto de Dados
+        run: dotnet restore ./src/JornadaMilhas.Dados
+      - name: Restore do Projeto de Domínio
+        run: dotnet restore ./src/JornadaMilhas.Dominio
+      - name: Build projeto de API
+        run: dotnet build ./src/JornadaMilhas.API --no-restore
+      - name: Build projeto de Dados
+        run: dotnet build ./src/JornadaMilhas.Dados --no-restore
+      - name: Build projeto de Domínio
+        run: dotnet build ./src/JornadaMilhas.Dominio --no-restore
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
