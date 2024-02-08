@@ -26,4 +26,4 @@ jobs:
       - name: Build projeto de Domínio
         run: dotnet build ./src/JornadaMilhas.Dominio --no-restore
       - name: Test da API
-        run: dotnet test ./test/JornadaMilhas.Unity.Test --no-build --verbosity normal
+        run: dotnet test ./test/JornadaMilhas.Unity.Test
