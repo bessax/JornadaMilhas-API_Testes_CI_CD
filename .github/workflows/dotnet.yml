@@ -1,0 +1,31 @@
+name: .NET
+'on':
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore do Projeto de API
+        run: dotnet restore ./src/JornadaMilhas.API
+      - name: Restore do Projeto de Dados
+        run: dotnet restore ./src/JornadaMilhas.Dados
+      - name: Restore do Projeto de Domínio
+        run: dotnet restore ./src/JornadaMilhas.Dominio
+      - name: Build projeto de API
+        run: dotnet build ./src/JornadaMilhas.API --no-restore
+      - name: Build projeto de Dados
+        run: dotnet build ./src/JornadaMilhas.Dados --no-restore
+      - name: Build projeto de Domínio
+        run: dotnet build ./src/JornadaMilhas.Dominio --no-restore
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
