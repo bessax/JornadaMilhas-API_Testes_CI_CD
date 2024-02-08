@@ -1,13 +1,13 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+# Este fluxo de trabalho irá construir um projeto .NET
+# Para mais informações, consulte: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ] # Corrigido para "main" pois muitos repositórios agora utilizam "main" como branch principal
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ] # Corrigido para "main" também
 
 jobs:
   build:
@@ -15,13 +15,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: ./src/JornadaMilhas.API/dotnet restore
-    - name: Build
-      run: ./src/JornadaMilhas.API/dotnet build --no-restore
-    
+        dotnet-version: '6.0.x' # Ajustado para aspas simples ao redor da versão
+    - name: Restore do Projeto de API
+      run: dotnet restore ./src/JornadaMilhas.API # Corrigido o comando de restore removendo espaços extras e adicionando barras inclinadas
+    - name: Restore do Projeto de Dados
+      run: dotnet restore ./src/JornadaMilhas.Dados # Corrigido o comando de restore removendo espaços extras e adicionando barras inclinadas
+    - name: Restore do Projeto de Domínio
+      run: dotnet restore ./src/JornadaMilhas.Dominio # Corrigido o comando de restore removendo espaços extras e adicionando barras inclinadas
+    - name: Build projeto de API
+      run: dotnet build ./src/JornadaMilhas.API --no-restore
+    - name: Build projeto de Dados
+      run: dotnet build ./src/JornadaMilhas.Dados --no-restore
+    - name: Build projeto de Domínio
+      run: dotnet build ./src/JornadaMilhas.Dominio --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
