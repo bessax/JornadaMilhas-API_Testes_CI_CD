@@ -1,4 +1,5 @@
 ﻿using JornadaMilhas.API.DTO.Request;
+using JornadaMilhas.API.DTO.Response;
 using JornadaMilhas.API.Service;
 using JornadaMilhas.Dados.Database;
 using JornadaMilhas.Dominio.Entidades;
@@ -12,12 +13,27 @@ public static class OfertaViagemExtensions
     {
         app.MapPost("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromBody] OfertaViagemRequest ofertaReq) =>
         {
-            await entityDAL.Adicionar(converter.RequestToEntity(ofertaReq));
-            Results.Ok(ofertaReq);
+            OfertaViagem oferta = new();
+            try
+            {
+                oferta = converter.RequestToEntity(ofertaReq);
+                if (oferta.EhValido)
+                {
+                   await entityDAL.Adicionar(oferta);
+                    return Results.Created("Oferta criada com sucesso!", converter.EntityToResponse(oferta));
+                } 
+                throw new Exception("Oferta inválida");
+                
+            }
+            catch (Exception ex)
+            {
+               return Results.Problem($"Erro:{oferta.Erros} => {ex.Message}");
+            }
+            
         }).WithTags("Oferta Viagem").WithSummary("Adiciona uma nova oferta de viagem.").WithOpenApi().RequireAuthorization();
 
         app.MapGet("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL) =>
-        {
+        {        
             return  Results.Ok(converter.EntityListToResponseList(await entityDAL.Listar()));
         }).WithTags("Oferta Viagem").WithSummary("Listagem de ofertas de viagem cadastrados.").WithOpenApi().RequireAuthorization();
 
@@ -53,5 +69,18 @@ public static class OfertaViagemExtensions
             return Results.NoContent();
 
         }).WithTags("Oferta Viagem").WithSummary("Atualiza uma oferta de viagem.").WithOpenApi().RequireAuthorization();
+
+        app.MapGet("/ofertas-viagem/{pagina}/{tamanhoPorPagina}", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, int pagina, int tamanhoPorPagina) =>
+        {
+            var oferta = await entityDAL.ListarPaginado(pagina, tamanhoPorPagina);
+            if (oferta is null) return Results.NotFound();
+            return Results.Ok(converter.EntityListToResponseList(oferta));
+        }).WithTags("Oferta Viagem").WithSummary("Obtem oferta de viagem paginado.").WithOpenApi().RequireAuthorization();
+
+        app.MapGet("/ofertas-viagem/ultimo-registro", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL) => {
+            var oferta = converter.EntityToResponse(await entityDAL.UltimoRegistroAsync());
+            if (oferta is null) { return Results.NotFound(); }
+            return Results.Ok(oferta);
+        }).WithTags("Oferta Viagem").WithSummary("Retorna a última oferta viagem cadastrada.").WithOpenApi().RequireAuthorization();
     }
 }

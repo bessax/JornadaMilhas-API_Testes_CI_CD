@@ -28,7 +28,7 @@ public class OfertaViagem : Valida
 
     protected override void Validar()
     {
-        if (Periodo.EhValido)
+        if (!Periodo.EhValido)
         {
             Erros.RegistrarErro(Periodo.Erros.Sumario);
         }

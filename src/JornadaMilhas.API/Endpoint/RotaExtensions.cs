@@ -12,8 +12,22 @@ public static class RotaExtensions
     {
         app.MapPost("/rota-viagem", async ([FromServices] RotaConverter converter, [FromServices] EntityDAL<Rota> entityDAL, [FromBody] RotaRequest rotaReq) =>
         {
-            await entityDAL.Adicionar(converter.RequestToEntity(rotaReq));
-            Results.Ok(rotaReq);
+            Rota rota = new();
+            try
+            {
+                rota = converter.RequestToEntity(rotaReq);
+                if (rota.EhValido)
+                {
+                    await entityDAL.Adicionar(converter.RequestToEntity(rotaReq));
+                    return Results.Created("Rota criada com sucesso!", rotaReq);
+                }
+                throw new Exception("Rota inválida.");
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"Erro:{rota.Erros} => {ex.Message}");
+            }
+           
         }).WithTags("Rota Viagem").WithSummary("Adiciona uma nova rota de viagem.").WithOpenApi().RequireAuthorization();
 
         app.MapGet("/rota-viagem", async ([FromServices] RotaConverter converter, [FromServices] EntityDAL<Rota> entityDAL) =>
@@ -51,5 +65,18 @@ public static class RotaExtensions
             return Results.NoContent();
 
         }).WithTags("Rota Viagem").WithSummary("Atualiza uma rota de viagem.").WithOpenApi().RequireAuthorization();
+
+        app.MapGet("/rota-viagem/{pagina}/{tamanhoPorPagina}", async ([FromServices] RotaConverter converter, [FromServices] EntityDAL<Rota> entityDAL, int pagina, int tamanhoPorPagina) =>
+        {
+            var rotas = await entityDAL.ListarPaginado(pagina, tamanhoPorPagina);
+            if (rotas is null) return Results.NotFound();
+            return Results.Ok(converter.EntityListToResponseList(rotas));
+        }).WithTags("Rota Viagem").WithSummary("Obtem a consulta de rota paginada.").WithOpenApi().RequireAuthorization();
+
+        app.MapGet("/rota-viagem/ultimo-registro", async ([FromServices] RotaConverter converter, [FromServices] EntityDAL<Rota> entityDAL) => {
+            var rota = converter.EntityToResponse(await entityDAL.UltimoRegistroAsync());
+            if (rota is null) { return Results.NotFound(); }
+            return Results.Ok(rota);
+        }).WithTags("Rota Viagem").WithSummary("Retorna a última rota de viagem cadastrada.").WithOpenApi().RequireAuthorization();
     }
 }

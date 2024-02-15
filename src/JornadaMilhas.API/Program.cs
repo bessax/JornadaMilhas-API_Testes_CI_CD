@@ -3,6 +3,7 @@ using JornadaMilhas.API.Service;
 using JornadaMilhas.Dados;
 using JornadaMilhas.Dados.Database;
 using JornadaMilhas.Dominio.Entidades;
+using JornadaMilhas.Dominio.ValueObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-
 builder.Services.AddDbContext<JornadaMilhasContext>((options) => {
     options
         .UseLazyLoadingProxies()
-        .UseSqlServer(builder.Configuration["ConnectionString:DefaultConnection"]);            
+        .UseSqlServer(builder.Configuration["ConnectionString:DefaultConnection"]);
 });
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
@@ -65,6 +65,8 @@ var app = builder.Build();
 MigracoesPendentes.ExecuteMigration(app);
 
 ConfigureDefaultUser(app.Services).GetAwaiter().GetResult();
+
+AdicionaRegistrosTabela(app.Services).GetAwaiter().GetResult();
 
 if (app.Environment.IsDevelopment())
 {
@@ -116,6 +118,36 @@ async Task ConfigureDefaultUser(IServiceProvider serviceProvider)
             if (!result.Succeeded)
             {
                 throw new Exception("Erro ao criar o usuário padrão.");
+            }
+        }
+    }
+}
+
+async Task AdicionaRegistrosTabela(IServiceProvider serviceProvider)
+{
+    using (var scope = serviceProvider.CreateScope())
+    {
+        using (var context = scope.ServiceProvider.GetService<JornadaMilhasContext>())
+        {
+            var ofertas = await context!.OfertasViagem.ToListAsync();
+            if (ofertas.Count == 0)
+            {
+                var oferta1 = new OfertaViagem
+                {
+                    Preco = 108.99,
+                    Rota = new Rota("Origem1", "Destino1"),
+                    Periodo = new Periodo(new DateTime(2024, 1, 1), new DateTime(2024, 1, 5))
+                };
+
+                var oferta2 = new OfertaViagem
+                {
+                    Preco = 200.99,
+                    Rota = new Rota("Origem2", "Destino2"),
+                    Periodo = new Periodo(new DateTime(2024, 1, 1), new DateTime(2024, 1, 5))
+                };
+
+                context.OfertasViagem.AddRange(oferta1, oferta2);
+                context.SaveChanges();
             }
         }
     }
