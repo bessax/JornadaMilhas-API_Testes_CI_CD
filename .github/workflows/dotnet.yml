@@ -25,7 +25,7 @@ jobs:
         run: dotnet build ./src/JornadaMilhas.Dados --no-restore
       - name: Build projeto de Domínio
         run: dotnet build ./src/JornadaMilhas.Dominio --no-restore
-      #- name: Testes unitários
-        #run: dotnet test ./test/JornadaMilhas.Unity.Test    
+      - name: Testes unitários
+        run: dotnet test ./test/JornadaMilhas.Unity.Test    
       - name: Testes Integração
-        run: dotnet test ./JornadaMilhas.Integration.Test.API   
+        run: dotnet test ./test/JornadaMilhas.Integration.Test.API   
