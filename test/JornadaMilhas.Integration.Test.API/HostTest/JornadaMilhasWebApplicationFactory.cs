@@ -60,7 +60,6 @@ public class JornadaMilhasWebApplicationFactory : WebApplicationFactory<Program>
         var clientAutenticado = this.CreateClient();
         
         clientAutenticado.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token!.Token);
-
         return clientAutenticado;
     }
 }
