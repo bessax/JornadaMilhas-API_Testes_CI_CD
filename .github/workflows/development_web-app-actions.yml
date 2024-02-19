@@ -35,7 +35,7 @@ jobs:
         run: dotnet build ./src/JornadaMilhas.Dominio --no-restore
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ./src/JornadaMilhas.API
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
