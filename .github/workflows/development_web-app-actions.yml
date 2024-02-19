@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -22,18 +22,11 @@ jobs:
 
       ###testes
       - name: Testes unitários
-        run: dotnet test ./test/JornadaMilhas.Unity.Test
-        
+        run: dotnet test ./test/JornadaMilhas.Unity.Test        
       - name: Testes de Integração
         run: dotnet test ./test/JornadaMilhas.Integration.Test.API
         
       ###build
-      - name: Restore do Projeto de API
-        run: dotnet restore ./src/JornadaMilhas.API
-      - name: Restore do Projeto de Dados
-        run: dotnet restore ./src/JornadaMilhas.Dados
-      - name: Restore do Projeto de Domínio
-        run: dotnet restore ./src/JornadaMilhas.Dominio
       - name: Build projeto de API
         run: dotnet build ./src/JornadaMilhas.API --no-restore
       - name: Build projeto de Dados
