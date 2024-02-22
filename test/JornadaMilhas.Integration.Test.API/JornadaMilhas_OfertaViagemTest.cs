@@ -276,4 +276,20 @@ public class JornadaMilhas_OfertaViagemTest :IClassFixture<JornadaMilhasWebAppli
         Assert.Equal(HttpStatusCode.NotFound, resultado.StatusCode);
 
     }
+
+    [Fact]
+    public async Task GET_Retorna_OfertaViagem_Por_Id_Invalido()
+    {
+        //Arrange 
+
+        using var client = await app.GetClientWithAccessTokenAsync();
+
+        int id = int.MinValue;
+        //Act  
+        var resultado = await client.GetAsync("/ofertas-viagem/" + id);
+
+        //Assert
+        Assert.Equal(HttpStatusCode.NotFound, resultado.StatusCode);
+
+    }
 }

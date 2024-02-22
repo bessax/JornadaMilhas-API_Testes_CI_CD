@@ -45,4 +45,5 @@ public class JornadaMilhas_AuthTest: IClassFixture<JornadaMilhasWebApplicationFa
 
         Assert.Equal(HttpStatusCode.BadRequest, resultado.StatusCode);
     }
+    
 }
