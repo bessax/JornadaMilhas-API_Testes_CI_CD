@@ -35,4 +35,5 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: 'Build Concluída'
-          body: 'Sua build foi concluída com sucesso!'          
+          body: 'Sua build foi concluída com sucesso!' 
+          to: andrebessax@gmail.com
