@@ -7,10 +7,7 @@ pool:
 jobs:
 - job: Build_and_Deploy
   displayName: 'Build and deploy ASP.Net Core app to Azure Web App - web-app-actions'
-  steps:
-  - checkout: self
-    target: development
-    
+  
   - task: UseDotNet@2
     displayName: 'Setup .NET'
     inputs:
