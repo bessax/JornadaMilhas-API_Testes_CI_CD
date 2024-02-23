@@ -27,3 +27,13 @@ jobs:
         run: dotnet build ./src/JornadaMilhas.Dominio --no-restore
       - name: Test da API
         run: dotnet test ./test/JornadaMilhas.Unity.Test
+      - name: Enviar e-mail
+        uses: dawidd6/action-send-mail@v2
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: 'Build Concluída'
+          body: 'Sua build foi concluída com sucesso!'
+          to: andrebessax@gmail.com
