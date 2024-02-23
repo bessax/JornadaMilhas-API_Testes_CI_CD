@@ -1,0 +1,35 @@
+trigger:
+- development
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: Build_and_Deploy
+  displayName: 'Build and deploy ASP.Net Core app to Azure Web App - web-app-actions'
+  steps:
+  - checkout: self
+
+  - task: UseDotNet@2
+    displayName: 'Setup .NET'
+    inputs:
+      packageType: 'sdk'
+      version: '8.0.x'
+
+  - script: |
+      dotnet test ./test/JornadaMilhas.Unity.Test
+      dotnet test ./test/JornadaMilhas.Integration.Test.API
+    displayName: 'Run Unit and Integration Tests'
+
+  - script: |
+      dotnet build ./src/JornadaMilhas.API --no-restore
+      dotnet build ./src/JornadaMilhas.Dados --no-restore
+      dotnet build ./src/JornadaMilhas.Dominio --no-restore
+      dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)/myapp ./src/JornadaMilhas.API
+    displayName: 'Build projects'
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish Artifact'
+    inputs:
+      artifactName: '.net-app'
+      targetPath: '$(Build.ArtifactStagingDirectory)/myapp'
