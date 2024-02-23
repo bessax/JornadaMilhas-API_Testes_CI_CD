@@ -37,3 +37,4 @@ jobs:
           subject: 'Build Concluída'
           body: 'Sua build foi concluída com sucesso!' 
           to: andrebessax@gmail.com
+          from: andrebessax@gmail.com 
