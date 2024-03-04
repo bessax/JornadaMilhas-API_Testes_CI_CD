@@ -220,7 +220,7 @@ public class JornadaMilhas_OfertaViagemTest :IClassFixture<JornadaMilhasWebAppli
     }
 
     [Fact]
-    public async Task GET_Retorna_OfertaViagem_Paginada_Pega_Oferta_Terceira_Pagina()
+    public async Task GET_Retorna_OfertaViagem_Paginada_Pega_Primeira_Oferta_Segunda_Pagina()
     {
         //Arrange  
 
@@ -236,8 +236,8 @@ public class JornadaMilhas_OfertaViagemTest :IClassFixture<JornadaMilhasWebAppli
 
         //Assert
         Assert.Equal(HttpStatusCode.OK, resultado.StatusCode);
-        Assert.True(response != null);
-        Assert.Equal(tamanhoPorPagina, response.Count());
+        Assert.True(response!.First() != null);
+        Assert.Equal(tamanhoPorPagina, response!.Count());
     }
 
     [Fact]
