@@ -1,31 +1,60 @@
-name: .NET
+#dotnet test ./test/JornadaMilhas.Unity.Test
+#dotnet test ./test/JornadaMilhas.Integration.Test.API
+#dotnet publish ./src/JornadaMilhas.API
+name: Pipeline
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+ push:
+  branches: ["master"]
+ pull_request:
+  branches: ["master"]
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+   name: Minha primeira pipeline  
+   runs-on: ubuntu-latest
+   steps:     
       - name: Setup .NET
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 8.0.x
-      - name: Restore do Projeto de API
-        run: dotnet restore ./src/JornadaMilhas.API
-      - name: Restore do Projeto de Dados
-        run: dotnet restore ./src/JornadaMilhas.Dados
-      - name: Restore do Projeto de Domínio
-        run: dotnet restore ./src/JornadaMilhas.Dominio
-      - name: Build projeto de API
-        run: dotnet build ./src/JornadaMilhas.API --no-restore
-      - name: Build projeto de Dados
-        run: dotnet build ./src/JornadaMilhas.Dados --no-restore
-      - name: Build projeto de Domínio
-        run: dotnet build ./src/JornadaMilhas.Dominio --no-restore
-      - name: Testes unitários
-        run: dotnet test ./test/JornadaMilhas.Unity.Test --no-build --verbosity normal
-      - name: Testes de Integração
-        run: dotnet test ./test/JornadaMilhas.Integration.Test.API --no-build --verbosity normal
+      - name: Checkout do código
+        uses: actions/checkout@v2      
+
+       #dotnet test ./test/JornadaMilhas.Unity.Test
+      - name: Execução do teste de unidade 
+        run: dotnet test ./test/JornadaMilhas.Unity.Test
+
+      #dotnet test ./test/JornadaMilhas.Integration.Test.API 
+      - name: Testes Integração
+        run: dotnet test ./test/JornadaMilhas.Integration.Test.API 
+
+       #dotnet publish ./src/JornadaMilhas.API
+      - name: Publicando a API
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ./src/JornadaMilhas.API
+      
+      - name: Upload de artefato para deploy
+        uses: actions/upload-artifact@v3
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+           name: .net-app
+      
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'jornadamilhas-api'
+          slot-name: 'Production'
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9ABDA58C7FE54ACDA81C70C601C19874 }}
